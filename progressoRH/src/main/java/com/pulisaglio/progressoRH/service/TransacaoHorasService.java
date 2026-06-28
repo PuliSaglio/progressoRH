@@ -7,6 +7,7 @@ import com.pulisaglio.progressoRH.model.enums.TransacaoTipo;
 import com.pulisaglio.progressoRH.repository.BancoHorasRepository;
 import com.pulisaglio.progressoRH.repository.ContratoRepository;
 import com.pulisaglio.progressoRH.repository.TransacaoHorasRepository;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -53,6 +54,21 @@ public class TransacaoHorasService {
 
     public List<TransacaoHoras> findByContratoId(Integer contratoId) {
         return transacaoHorasRepository.findByContratoId(contratoId);
+    }
+
+    public List<TransacaoHoras> findByPeriodo(
+        LocalDate dataInicial,
+        LocalDate dataFinal
+    ) {
+        if (dataFinal == null) {
+            throw new IllegalArgumentException("dataFinal must not be null");
+        }
+        LocalDate efectiveDataInicial =
+            dataInicial != null ? dataInicial : LocalDate.now();
+        return transacaoHorasRepository.findByPeriodo(
+            efectiveDataInicial,
+            dataFinal
+        );
     }
 
     /**
