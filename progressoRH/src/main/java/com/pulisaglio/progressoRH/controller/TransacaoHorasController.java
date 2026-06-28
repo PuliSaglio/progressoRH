@@ -3,13 +3,13 @@ package com.pulisaglio.progressoRH.controller;
 import com.pulisaglio.progressoRH.exception.PeriodoConsolidadoException;
 import com.pulisaglio.progressoRH.model.TransacaoHoras;
 import com.pulisaglio.progressoRH.service.TransacaoHorasService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/transacoes-horas")
@@ -17,7 +17,9 @@ public class TransacaoHorasController {
 
     private final TransacaoHorasService transacaoHorasService;
 
-    public TransacaoHorasController(TransacaoHorasService transacaoHorasService) {
+    public TransacaoHorasController(
+        TransacaoHorasService transacaoHorasService
+    ) {
         this.transacaoHorasService = transacaoHorasService;
     }
 
@@ -27,11 +29,15 @@ public class TransacaoHorasController {
             transacaoHorasService.save(transacao);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (PeriodoConsolidadoException e) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+            return ResponseEntity.status(
+                HttpStatus.UNPROCESSABLE_ENTITY
+            ).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ).build();
         }
     }
 
@@ -44,20 +50,52 @@ public class TransacaoHorasController {
     @GetMapping("/{id}")
     public ResponseEntity<TransacaoHoras> getById(@PathVariable Long id) {
         Optional<TransacaoHoras> opt = transacaoHorasService.findById(id);
-        return opt.map(t -> ResponseEntity.ok(t))
-                  .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        return opt
+            .map(t -> ResponseEntity.ok(t))
+            .orElseGet(() ->
+                ResponseEntity.status(HttpStatus.NOT_FOUND).build()
+            );
     }
 
     @GetMapping("/contrato/{contratoId}")
-    public ResponseEntity<List<TransacaoHoras>> getByContratoId(@PathVariable Integer contratoId) {
-        List<TransacaoHoras> list = transacaoHorasService.findByContratoId(contratoId);
+    public ResponseEntity<List<TransacaoHoras>> getByContratoId(
+        @PathVariable Integer contratoId
+    ) {
+        List<TransacaoHoras> list = transacaoHorasService.findByContratoId(
+            contratoId
+        );
         return ResponseEntity.ok(list);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody TransacaoHoras transacao) {
+    @GetMapping("/busca")
+    public ResponseEntity<List<TransacaoHoras>> buscarPorPeriodo(
+        @RequestParam(required = false) LocalDate dataInicial,
+        @RequestParam LocalDate dataFinal
+    ) {
         try {
-            Optional<TransacaoHoras> existing = transacaoHorasService.findById(id);
+            List<TransacaoHoras> list = transacaoHorasService.findByPeriodo(
+                dataInicial,
+                dataFinal
+            );
+            return ResponseEntity.ok(list);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ).build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> update(
+        @PathVariable Long id,
+        @RequestBody TransacaoHoras transacao
+    ) {
+        try {
+            Optional<TransacaoHoras> existing = transacaoHorasService.findById(
+                id
+            );
             if (existing.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
@@ -65,11 +103,15 @@ public class TransacaoHorasController {
             transacaoHorasService.update(transacao);
             return ResponseEntity.ok().build();
         } catch (PeriodoConsolidadoException e) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+            return ResponseEntity.status(
+                HttpStatus.UNPROCESSABLE_ENTITY
+            ).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ).build();
         }
     }
 
@@ -82,9 +124,13 @@ public class TransacaoHorasController {
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (PeriodoConsolidadoException e) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+            return ResponseEntity.status(
+                HttpStatus.UNPROCESSABLE_ENTITY
+            ).build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ).build();
         }
     }
 }
