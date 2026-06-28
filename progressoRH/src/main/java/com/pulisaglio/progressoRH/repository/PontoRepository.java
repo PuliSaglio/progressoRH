@@ -95,4 +95,16 @@ public class PontoRepository {
         final String sql = "DELETE FROM pontos WHERE id_ponto = ?";
         jdbcTemplate.update(sql, id);
     }
+
+    public List<Ponto> findByContratoIdAndMonth(
+        Integer contratoId,
+        int ano,
+        int mes
+    ) {
+        final String sql =
+            "SELECT id_ponto, tipo, data_hora, contrato_id FROM pontos " +
+            "WHERE contrato_id = ? AND YEAR(data_hora) = ? AND MONTH(data_hora) = ? " +
+            "ORDER BY data_hora ASC";
+        return jdbcTemplate.query(sql, ROW_MAPPER, contratoId, ano, mes);
+    }
 }

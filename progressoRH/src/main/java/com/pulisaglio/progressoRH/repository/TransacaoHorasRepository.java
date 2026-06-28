@@ -126,4 +126,19 @@ public class TransacaoHorasRepository {
             Date.valueOf(dataFinal)
         );
     }
+
+    public List<TransacaoHoras> findAprovadasByContratoIdAndMonth(
+        Integer contratoId,
+        int ano,
+        int mes
+    ) {
+        final String sql =
+            "SELECT id_transacao, data_referencia, quantidade_horas, justificativa, " +
+            "status, comprovante, tipo, contrato_id " +
+            "FROM transacoes_horas " +
+            "WHERE contrato_id = ? AND YEAR(data_referencia) = ? AND MONTH(data_referencia) = ? " +
+            "AND status = 'APROVADO' " +
+            "ORDER BY data_referencia ASC";
+        return jdbcTemplate.query(sql, ROW_MAPPER, contratoId, ano, mes);
+    }
 }
