@@ -1,19 +1,24 @@
 package com.pulisaglio.progressoRH.model;
 
+import com.pulisaglio.progressoRH.model.enums.TipoPonto;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Ponto {
 
     private Integer idPonto;
-    private String tipo;
+    private TipoPonto tipo;
     private LocalDateTime dataHora;
     private Integer contratoId;
 
-    public Ponto() {
-    }
+    public Ponto() {}
 
-    public Ponto(Integer idPonto, String tipo, LocalDateTime dataHora, Integer contratoId) {
+    public Ponto(
+        Integer idPonto,
+        TipoPonto tipo,
+        LocalDateTime dataHora,
+        Integer contratoId
+    ) {
         this.idPonto = idPonto;
         this.tipo = tipo;
         this.dataHora = dataHora;
@@ -28,11 +33,11 @@ public class Ponto {
         this.idPonto = idPonto;
     }
 
-    public String getTipo() {
+    public TipoPonto getTipo() {
         return tipo;
     }
 
-    public void setTipo(String tipo) {
+    public void setTipo(TipoPonto tipo) {
         this.tipo = tipo;
     }
 
@@ -67,11 +72,18 @@ public class Ponto {
 
     @Override
     public String toString() {
-        return "Ponto{" +
-                "idPonto=" + idPonto +
-                ", tipo='" + tipo + '\'' +
-                ", dataHora=" + dataHora +
-                ", contratoId=" + contratoId +
-                '}';
+        return (
+            "Ponto{" +
+            "idPonto=" +
+            idPonto +
+            ", tipo='" +
+            tipo +
+            '\'' +
+            ", dataHora=" +
+            dataHora +
+            ", contratoId=" +
+            contratoId +
+            '}'
+        );
     }
 }

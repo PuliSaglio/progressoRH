@@ -3,10 +3,12 @@ package com.pulisaglio.progressoRH.service;
 import com.pulisaglio.progressoRH.model.Ponto;
 import com.pulisaglio.progressoRH.repository.ContratoRepository;
 import com.pulisaglio.progressoRH.repository.PontoRepository;
-import org.springframework.stereotype.Service;
-
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PontoService {
@@ -14,19 +16,27 @@ public class PontoService {
     private final PontoRepository pontoRepository;
     private final ContratoRepository contratoRepository;
 
-    public PontoService(PontoRepository pontoRepository, ContratoRepository contratoRepository) {
+    public PontoService(
+        PontoRepository pontoRepository,
+        ContratoRepository contratoRepository
+    ) {
         this.pontoRepository = pontoRepository;
         this.contratoRepository = contratoRepository;
     }
 
     public void save(Ponto ponto) {
-        if (ponto.getTipo() == null || ponto.getTipo().trim().isEmpty()) {
-            throw new IllegalArgumentException("Ponto tipo must not be empty");
+        if (ponto.getTipo() == null) {
+            throw new IllegalArgumentException("Ponto tipo must not be null");
         }
         if (ponto.getDataHora() == null) {
-            throw new IllegalArgumentException("Ponto dataHora must not be null");
+            throw new IllegalArgumentException(
+                "Ponto dataHora must not be null"
+            );
         }
-        if (ponto.getContratoId() == null || contratoRepository.findById(ponto.getContratoId()).isEmpty()) {
+        if (
+            ponto.getContratoId() == null ||
+            contratoRepository.findById(ponto.getContratoId()).isEmpty()
+        ) {
             throw new IllegalArgumentException("Contrato does not exist");
         }
         pontoRepository.save(ponto);
@@ -45,16 +55,38 @@ public class PontoService {
     }
 
     public void update(Ponto ponto) {
-        if (ponto.getTipo() == null || ponto.getTipo().trim().isEmpty()) {
-            throw new IllegalArgumentException("Ponto tipo must not be empty");
+        if (ponto.getTipo() == null) {
+            throw new IllegalArgumentException("Ponto tipo must not be null");
         }
         if (ponto.getDataHora() == null) {
-            throw new IllegalArgumentException("Ponto dataHora must not be null");
+            throw new IllegalArgumentException(
+                "Ponto dataHora must not be null"
+            );
         }
-        if (ponto.getContratoId() == null || contratoRepository.findById(ponto.getContratoId()).isEmpty()) {
+        if (
+            ponto.getContratoId() == null ||
+            contratoRepository.findById(ponto.getContratoId()).isEmpty()
+        ) {
             throw new IllegalArgumentException("Contrato does not exist");
         }
         pontoRepository.update(ponto);
+    }
+
+    public List<Ponto> findByPeriodo(
+        LocalDate dataInicial,
+        LocalDate dataFinal
+    ) {
+        if (dataFinal == null) {
+            throw new IllegalArgumentException("dataFinal must not be null");
+        }
+        LocalDate efectiveDataInicial =
+            dataInicial != null ? dataInicial : LocalDate.now();
+        LocalDateTime dataHoraInicio = efectiveDataInicial.atStartOfDay();
+        LocalDateTime dataHoraFim = dataFinal.atTime(LocalTime.MAX);
+        return pontoRepository.findByDataHoraBetween(
+            dataHoraInicio,
+            dataHoraFim
+        );
     }
 
     public void deleteById(Integer id) {

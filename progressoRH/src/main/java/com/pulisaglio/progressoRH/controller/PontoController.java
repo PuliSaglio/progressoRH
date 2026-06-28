@@ -2,12 +2,12 @@ package com.pulisaglio.progressoRH.controller;
 
 import com.pulisaglio.progressoRH.model.Ponto;
 import com.pulisaglio.progressoRH.service.PontoService;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/pontos")
@@ -27,7 +27,9 @@ public class PontoController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ).build();
         }
     }
 
@@ -40,18 +42,26 @@ public class PontoController {
     @GetMapping("/{id}")
     public ResponseEntity<Ponto> getById(@PathVariable Integer id) {
         Optional<Ponto> opt = pontoService.findById(id);
-        return opt.map(p -> ResponseEntity.ok(p))
-                  .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        return opt
+            .map(p -> ResponseEntity.ok(p))
+            .orElseGet(() ->
+                ResponseEntity.status(HttpStatus.NOT_FOUND).build()
+            );
     }
 
     @GetMapping("/contrato/{contratoId}")
-    public ResponseEntity<List<Ponto>> getByContratoId(@PathVariable Integer contratoId) {
+    public ResponseEntity<List<Ponto>> getByContratoId(
+        @PathVariable Integer contratoId
+    ) {
         List<Ponto> list = pontoService.findByContratoId(contratoId);
         return ResponseEntity.ok(list);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody Ponto ponto) {
+    public ResponseEntity<Void> update(
+        @PathVariable Integer id,
+        @RequestBody Ponto ponto
+    ) {
         try {
             Optional<Ponto> existing = pontoService.findById(id);
             if (existing.isEmpty()) {
@@ -63,7 +73,9 @@ public class PontoController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ).build();
         }
     }
 
@@ -75,5 +87,25 @@ public class PontoController {
         }
         pontoService.deleteById(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/busca")
+    public ResponseEntity<List<Ponto>> buscarPorPeriodo(
+        @RequestParam(required = false) LocalDate dataInicial,
+        @RequestParam LocalDate dataFinal
+    ) {
+        try {
+            List<Ponto> list = pontoService.findByPeriodo(
+                dataInicial,
+                dataFinal
+            );
+            return ResponseEntity.ok(list);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ).build();
+        }
     }
 }
